@@ -24,7 +24,7 @@ class Products extends Component
 
     public function index()
     {
-        return view('livewire.products',['products' => $this->products->paginate(10)]);
+        return view('livewire.products',['products' => $this->products->paginate(12)]);
     }
 
     public function view()
