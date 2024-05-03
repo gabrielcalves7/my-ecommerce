@@ -57,7 +57,7 @@ class User extends Component
                 'product' => $user,
                 'title' => "Editar Usuário",
                 "fields" => $fields,
-
+                'model' => "users"
             ]
         );
     }

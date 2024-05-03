@@ -45,6 +45,7 @@ Route::group(['middleware' => 'web'], function () {
             });
             Route::controller(User::class)->prefix('users')->group(function () {
                 Route::get('/view', 'view')->name('users.view');
+                Route::get('/', 'view')->name('users.view');
                 Route::get('/{id}', 'editUser')->name('single_user');
                 Route::post('/{id?}', 'saveUser')->name('save_user');
 

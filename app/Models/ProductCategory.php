@@ -10,4 +10,9 @@ class ProductCategory extends Model
     use HasFactory;
     protected $table = 'product_category';
 
+    public static function getAll()
+    {
+        return self::all()->pluck('name','id');
+    }
+
 }

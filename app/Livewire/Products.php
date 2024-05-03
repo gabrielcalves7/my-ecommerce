@@ -29,19 +29,31 @@ class Products extends Component
 
     public function view()
     {
-        $infos = [
+        $columns = [
             "image",
             "name",
             "price",
             "category_name",
             "description",
-            "actions"];
-        return view('livewire.admin.products.list',['products' => $this->products->paginate(10), 'title' => "Ver Produtos", 'infos' => $infos]);
+            "actions"
+        ];
+        return view('livewire.admin.products.list',[
+            'products' => $this->products->paginate(10),
+            'title' => "Ver Produtos",
+            'infos' => $columns
+        ]);
     }
 
     public function editProduct($id){
         $product = Product::findOrFail($id);
-        return view('livewire.admin.products.edit',['product' => $product, 'title' => "Editar Produto"]);
+        $fields = $product->createForm($product);
+
+        return view('livewire.admin.users.edit',[
+            'product' => $product,
+            'model' => 'products',
+            'title' => "Editar Produto",
+            'fields' => $fields,
+        ]);
     }
 
     public function saveProduct($id){
