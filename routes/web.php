@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use App\Livewire\Admin;
 use App\Livewire\LoginRegister;
 use App\Livewire\User;
@@ -18,6 +19,9 @@ use App\Livewire\Counter;
 |
 */
 Route::group(['middleware' => 'web'], function () {
+    Route::controller(UserController::class)->group(function () {
+        Route::get('/testa', 'logout')->name('buceta');
+    });
 
     Route::get('/counter', Counter::class);
     Route::get('/create-post', \App\Livewire\CreatePost::class);
@@ -38,13 +42,12 @@ Route::group(['middleware' => 'web'], function () {
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::controller(Admin::class)->group(function () {
             Route::controller(Products::class)->prefix('products')->group(function () {
-                Route::get('/view', 'view')->name('products.view');
+                Route::get('/', 'view')->name('products.view');
                 Route::get('/product/{id}', 'editProduct')->name('single_product');
                 Route::post('/product/{id?}', 'saveProduct')->name('save_product');
 
             });
             Route::controller(User::class)->prefix('users')->group(function () {
-                Route::get('/view', 'view')->name('users.view');
                 Route::get('/', 'view')->name('users.view');
                 Route::get('/{id}', 'editUser')->name('single_user');
                 Route::post('/{id?}', 'saveUser')->name('save_user');

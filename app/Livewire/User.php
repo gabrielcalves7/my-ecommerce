@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\User as userModel;
+use App\Models\User as UserModel;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -33,14 +33,16 @@ class User extends Component
             "name",
             "email",
             "userType",
-            "phone",
+            "phoneNumber",
             "birthDate",
             "document",
             "actions",
         ];
-        $this->user->paginate(10);
+        $a = $this->user->paginate(10);
+
         return view('livewire.admin.users.list', [
-            'data' => $this->user->paginate(10),
+            'data' => $a,
+            'langFile' => "users",
             'title' => "Ver Produtos",
             'infos' => $columns
         ]);
@@ -52,7 +54,8 @@ class User extends Component
 
         $fields = $user->createForm($user);
 
-        return view('livewire.admin.users.edit',
+        return view(
+            'livewire.admin.users.edit',
             [
                 'product' => $user,
                 'title' => "Editar Usuário",
@@ -64,7 +67,7 @@ class User extends Component
 
     public function saveUser()
     {
-        $user = new userModel();
+        $user = new UserModel();
 
         $data = request()->validate($user->getRules(request()->id));
         $update = $user->updateOrCreate($data);
@@ -76,7 +79,8 @@ class User extends Component
             ]);
         }
         return redirect()->back()->with([
-            'message', "Operação não realizada",
+            'message',
+            "Operação não realizada",
             'type' => 'warning'
         ]);
     }

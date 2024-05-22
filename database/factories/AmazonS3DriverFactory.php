@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Address>
  */
-class PhoneFactory extends Factory
+class AmazonS3DriverFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,9 +19,8 @@ class PhoneFactory extends Factory
         return [
             'created_at' => now(),
             'updated_at' => now(),
-            'user_id' => 1,
-            'number' => $this->faker->phoneNumber(),
-            'main' => 0
+            'url' => $this->faker->phoneNumber(),
+            'deleted' => 0
         ];
     }
 }

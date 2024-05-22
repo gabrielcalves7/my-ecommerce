@@ -18,14 +18,15 @@ class Header extends Component
     {
         $userID = Auth::id();
         $this->userID = $userID;
-        if($userID != null){
-            $this->user = User::where('id',$userID);
-            $this->userType = User::where('id',$userID)->select('user_type_id')->get();
+        if ($userID != null) {
+            $this->user = User::where('id', $userID);
+            $this->userType = User::where('id', $userID)->select('user_type_id')->get();
         }
         $this->categories = $this->addNavigationToMenu();
     }
 
-    private function menu(){
+    private function menu()
+    {
         return [
             ["name" => "Menu", "url" => null],
             ["name" => "Home", "url" => route('home')],
@@ -36,19 +37,21 @@ class Header extends Component
             ["name" => "Registrar", "url" => null]
         ];
     }
-    private function addNavigationToMenu(){
+
+    private function addNavigationToMenu()
+    {
         $categories = $this->menu();
-        $actions = ["list","create"];
-        foreach ($actions as $action){
-            foreach ($categories as &$value){
-                    $value['actions'][] = ["name" => $action, 'url' => '/' . $action];
+        $actions = ["list", "create"];
+        foreach ($actions as $action) {
+            foreach ($categories as &$value) {
+                $value['actions'][] = ["name" => $action, 'url' => '/' . $action];
             }
         }
         return $categories;
     }
+
     public function render()
     {
-
-        return view('livewire.header',['categories'=>$this->categories, 'public' => true]);
+        return view('livewire.header', ['categories' => $this->categories, 'public' => true]);
     }
 }
