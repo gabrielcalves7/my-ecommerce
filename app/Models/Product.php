@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Product extends Model
 {
     use HasFactory;
+    protected $table = 'product';
 
     protected $fillable = [
         "name",
@@ -39,7 +40,40 @@ class Product extends Model
         return array_merge($v_EditRules, $v_CreateRules);
     }
 
-    protected $table = 'product';
+    public function createForm(Product $product = null): array
+    {
+        $fields = [
+            [
+                "name" => "name",
+                "type" => "text",
+                "label" => "name"
+            ],
+            [
+                "name" => "price",
+                "type" => "text",
+                "label" => "price"
+            ],
+            [
+                "name" => "description",
+                "type" => "text",
+                "label" => "description"
+            ],
+            [
+                "name" => "category",
+                "type" => "select",
+                "label" => "category",
+                "options" => ProductCategory::getAll(),
+                "selected" => $product ? $product->user_type_id : "",
+            ],
+            [
+                "name" => "image",
+                "type" => "image",
+                "label"=> "image"
+            ],
+        ];
+        return $fields;
+    }
+
 
     public static function getAll()
     {
@@ -62,4 +96,6 @@ class Product extends Model
     {
         return $this->belongsTo(ProductCategory::class);
     }
+
+
 }
