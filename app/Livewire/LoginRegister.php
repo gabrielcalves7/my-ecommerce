@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 class LoginRegister extends Component
@@ -41,12 +42,25 @@ class LoginRegister extends Component
             'email' => $this->email,
             'password' => $this->password
         ])) {
-            session()->flash("Message", "logado");
-            return redirect()->intended('/admin');
+            return redirect()->route('admin')->with([
+                'message' => 'Você está logado.',
+                'type' => 'success'
+            ]);
         } else {
-            session()->flash("Message", "deslogado");
-            return redirect()->back();
+            session()->flash('message', 'Your  message here');
+            return redirect()->route('login')->with(
+                ['message' => 'Não foi possivel realizar o login, por favor tente novamente.', 'type' => 'warning']
+            );
         }
+//        return redirect()->route('users.view')->with([
+//            'message' => "Operação realizada com sucesso",
+//            'type' => "success"
+//        ]);
+//    }
+//return redirect()->back()->with([
+//'message', "Operação não realizada",
+//'type' => 'warning'
+//]);
     }
 
     public function registerForm()
@@ -67,6 +81,10 @@ class LoginRegister extends Component
 
         session()->flash("Registrado fdp");
         $this->resetInputFields();
+    }
+
+    public function logout(){
+        Auth::logout();
     }
 
 }

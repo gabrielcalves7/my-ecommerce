@@ -27,21 +27,23 @@ class AdminHeader extends Component
             [
                 "name" => "Home",
                 "actions" => [],
-                "url" => route('admin')
+                "url" => route("admin")
             ],
             [
                 "name" => "Users",
                 "actions" => [
                     "view",
                     "create"
-                ]
+                ],
+                "url" => route("users.view")
             ],
             [
                 "name" => "Products",
                 "actions" => [
                     "view",
                     "create"
-                ]
+                ],
+                "url" => route("products.view")
             ]
         ];
         return $this->setActionsURL($options);

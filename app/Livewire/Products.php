@@ -11,6 +11,7 @@ class Products extends Component
 {
 
     use WithPagination;
+
     /**
      * @var
      */
@@ -24,7 +25,7 @@ class Products extends Component
 
     public function index()
     {
-        return view('livewire.products',['products' => $this->products->paginate(12)]);
+        return view('livewire.products', ['products' => $this->products->paginate(12)]);
     }
 
     public function view()
@@ -37,18 +38,20 @@ class Products extends Component
             "description",
             "actions"
         ];
-        return view('livewire.admin.products.list',[
-            'products' => $this->products->paginate(10),
+        return view('livewire.admin.products.list', [
+            'data' => $this->products->paginate(10),
+            'langFile' => "products",
             'title' => "Ver Produtos",
             'infos' => $columns
         ]);
     }
 
-    public function editProduct($id){
+    public function editProduct($id)
+    {
         $product = Product::findOrFail($id);
         $fields = $product->createForm($product);
 
-        return view('livewire.admin.users.edit',[
+        return view('livewire.admin.users.edit', [
             'product' => $product,
             'model' => 'products',
             'title' => "Editar Produto",
@@ -56,18 +59,18 @@ class Products extends Component
         ]);
     }
 
-    public function saveProduct($id){
+    public function saveProduct($id)
+    {
         $product = new Product();
 
         $data = request()->validate($product->getRules(request()->id));
         $update = $product->updateOrCreate($data);
 
-        if($update){
+        if ($update) {
             return redirect()->route('products.view')->with('message', 'Operação realizada com sucesso.');;
         }
 
         return redirect()->back()->withInput()->with('error_message', "Operação não realizada");
-
     }
 
 

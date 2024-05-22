@@ -2,19 +2,12 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Exception;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Models
 {
-    use HasApiTokens, HasFactory, Notifiable;
-
-
+    use HasApiTokens, Notifiable;
     /**
      * The attributes that are mass assignable.
      *
@@ -124,21 +117,10 @@ class User extends Authenticatable
     public static function getAll()
     {
         return self::join('user_type', 'user.user_type_id', '=', 'user_type.id')
-            ->select('user_type.name as user_type', 'user.*');
-    }
-
-    public function getFillable()
-    {
-        return $this->fillable;
-    }
-
-    public function updateOrCreate($data)
-    {
-        try {
-            return (bool)self::query()->updateOrCreate(['id' => $data['id'] ?? null], $data);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return false;
-        }
+            ->leftJoin('phone', function ($join) {
+                $join->on('user.id', '=', 'phone.user_id')
+                    ->where('phone.main', '=', true);
+            })
+            ->select('user_type.name as userType', 'user.*', 'phone.number as phoneNumber');
     }
 }
