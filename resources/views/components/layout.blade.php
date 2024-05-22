@@ -17,7 +17,6 @@
     @livewireScripts
 </script>
 <script>
-    adfasd
     @if(isset($message) || session()->has('message'))
     document.addEventListener('DOMContentLoaded', function() {
         @if(isset($message['success']))
@@ -30,8 +29,6 @@
         toastr.{{ session('type') }}('{{session('message')}}')
         @endif
     });
-    @else
-        nomesage
     @endif
 </script>
 </html>

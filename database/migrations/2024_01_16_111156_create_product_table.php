@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->decimal('price', 8, 2);
-            $table->string('SKU', 150)->nullable();
+            $table->string('sku', 150)->nullable();
             $table->integer('category')->unsigned();
             $table->foreign('category')->references('id')->on('product_category')->onDelete('cascade');
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

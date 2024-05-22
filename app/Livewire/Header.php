@@ -28,13 +28,12 @@ class Header extends Component
     private function menu()
     {
         return [
-            ["name" => "Menu", "url" => null],
             ["name" => "Home", "url" => route('home')],
             ["name" => "Produtos", "url" => route('getProducts')],
-            ["name" => "Serviços", "url" => null],
+            ["name" => "Serviços", "url" => route('home')],
             ["name" => "Contato", "url" => null],
             ["name" => "Login", "url" => route('login')],
-            ["name" => "Registrar", "url" => null]
+            ["name" => "Registrar", "url" => route('register')]
         ];
     }
 

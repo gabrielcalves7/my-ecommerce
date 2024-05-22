@@ -17,21 +17,19 @@
     </body>
     @livewireScripts
 </script>
-<script>
-    @if(isset($message) || session()->has('message'))
-    document.addEventListener('DOMContentLoaded', function() {
-        @if(isset($message['success']))
-        toastr.success({{$message}});
-        @elseif(isset($message['info']))
-        toastr.info({{$message}});
-        @elseif(isset($message['warning']))
-        toastr.warning({{$message}})
-        @else
-        toastr.{{ session('type') }}('{{session('message')}}')
-        @endif
-    });
-    @else
-        nomesage
-    @endif
-</script>
+@if(isset($message) || session()->has('message'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(isset($message['success']))
+            toastr.success({{$message}});
+            @elseif(isset($message['info']))
+            toastr.info({{$message}});
+            @elseif(isset($message['warning']))
+            toastr.warning({{$message}})
+            @else
+            toastr.{{ session('type') }}('{{session('message')}}')
+            @endif
+            });
+    </script>
+@endif
 </html>

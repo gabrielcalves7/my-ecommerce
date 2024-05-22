@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Helpers\Helper;
 use App\Models\Product;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -15,12 +15,15 @@ class Products extends Component
     /**
      * @var
      */
-    protected $products;
 
+    private string $model;
+    protected Product $product;
+    private array $formatedListColumns;
 
     public function __construct()
     {
-        $this->products = Product::getAll();
+        $this->model = 'products';
+        $this->product = new Product();
     }
 
     public function index()
@@ -30,36 +33,54 @@ class Products extends Component
 
     public function view()
     {
-        $columns = [
-            "image",
-            "name",
-            "price",
-            "category_name",
-            "description",
-            "actions"
-        ];
+        $data = $this->product->getAll();
+
+        $fields = $this->product->getFieldsForFormattedList();
+
+        $searchParams = request()->get(ucfirst($this->model)."Search");
+
+        if($searchParams != []){
+            $data = $this->product->handlePaginatedListsFilters($data, $searchParams);
+        }
+
+        $orderAsc = $searchParams['asc'] ?? 0;
+
         return view('livewire.admin.products.list', [
-            'data' => $this->products->paginate(10),
-            'langFile' => "products",
+            'data' => $data->paginate(10),
+            'isOrderAsc' => $orderAsc,
+            'model' => $this->model,
             'title' => "Ver Produtos",
-            'infos' => $columns
+            'unfilterableFields' => $this->product->unfilterableFields(),
+            'infos' => Helper::flattenArray($fields),
         ]);
     }
 
     public function editProduct($id)
     {
-        $product = Product::findOrFail($id);
+        $product = $this->product->findOrFail($id);
         $fields = $product->createForm($product);
 
-        return view('livewire.admin.users.edit', [
-            'product' => $product,
+        return view('livewire.admin.products.edit', [
+            'modelData' => $product,
             'model' => 'products',
             'title' => "Editar Produto",
             'fields' => $fields,
         ]);
     }
 
-    public function saveProduct($id)
+    public function createProductForm()
+    {
+        $fields = $this->product->createForm();
+
+        return view('livewire.admin.products.edit', [
+            'modelData' => $this->product,
+            'model' => 'products',
+            'title' => "Editar Produto",
+            'fields' => $fields,
+        ]);
+    }
+
+    public function saveProduct($id = null)
     {
         $product = new Product();
 
@@ -72,6 +93,7 @@ class Products extends Component
 
         return redirect()->back()->withInput()->with('error_message', "Operação não realizada");
     }
+
 
 
 }

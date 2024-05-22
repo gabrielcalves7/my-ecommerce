@@ -8,7 +8,7 @@
                 @if(isset($menu))
                 @foreach($menu as $value)
                     <li>
-                        <a href="{{$value['url'] ?? '/'.lcfirst($value['name'])}}" class="text-lg">
+                        <a href="{{$value['url'] ?? '/admin/'.lcfirst($value['name'])}}" class="text-lg">
                             {{$value['name']}}
                             @foreach($value['actions'] as $action)
                                 <li>

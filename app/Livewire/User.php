@@ -57,9 +57,9 @@ class User extends Component
         return view(
             'livewire.admin.users.edit',
             [
-                'product' => $user,
+                'modelData' => $user,
                 'title' => "Editar Usuário",
-                "fields" => $fields,
+                'fields' => $fields,
                 'model' => "users"
             ]
         );

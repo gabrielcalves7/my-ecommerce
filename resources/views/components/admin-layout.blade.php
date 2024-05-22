@@ -19,24 +19,22 @@
             </div>
 
             @livewire('footer')
-
-    </body>
-</script>
-<script>
-    @if(isset($message) || session()->has('message'))
-        document.addEventListener('DOMContentLoaded', function() {
-            @if(isset($message['success']))
-                toastr.success({{$message}});
-            @elseif(isset($message['info']))
-                toastr.info({{$message}});
-            @elseif(isset($message['warning']))
-                toastr.warning({{$message}})
-            @else
-                toastr.{{ session('type') }}('{{session('message')}}')
+            @if(isset($message) || session()->has('message'))
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    @if(isset($message['success']))
+                    toastr.success({{$message}});
+                    @elseif(isset($message['info']))
+                    toastr.info({{$message}});
+                    @elseif(isset($message['warning']))
+                    toastr.warning({{$message}})
+                    @else
+                    toastr.{{ session('type') }}('{{session('message')}}')
+                    @endif
+                });
+            </script>
             @endif
-        });
-    @else
-        nomesage
-    @endif
-</script>
+    </body>
+
+
 </html>

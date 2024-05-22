@@ -43,6 +43,7 @@ Route::group(['middleware' => 'web'], function () {
         Route::controller(Admin::class)->group(function () {
             Route::controller(Products::class)->prefix('products')->group(function () {
                 Route::get('/', 'view')->name('products.view');
+                Route::get('/fdp/', 'createProductForm')->name('products.create');
                 Route::get('/product/{id}', 'editProduct')->name('single_product');
                 Route::post('/product/{id?}', 'saveProduct')->name('save_product');
 

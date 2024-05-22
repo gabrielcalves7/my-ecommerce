@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\DB;
 
-class Product extends Model
+class Product extends Models
 {
     use HasFactory;
+
     protected $table = 'product';
 
     protected $fillable = [
@@ -19,6 +19,7 @@ class Product extends Model
         "category",
         "description",
         "image",
+        "sku"
     ];
 
     public function getRules($id = null): array
@@ -28,7 +29,8 @@ class Product extends Model
             'price' => 'required',
             'category' => 'required',
             'description' => 'required',
-            'image' => 'required',
+            'sku' => 'required',
+            'image'
         ];
 
         $v_EditRules = [
@@ -42,9 +44,9 @@ class Product extends Model
         return array_merge($v_EditRules, $v_CreateRules);
     }
 
-    public function createForm(Product $product = null): array
+    public function createForm(): array
     {
-        $fields = [
+        return [
             [
                 "name" => "name",
                 "type" => "text",
@@ -61,39 +63,49 @@ class Product extends Model
                 "label" => "description"
             ],
             [
+                "name" => "sku",
+                "type" => "text",
+                "label" => "sku"
+            ],
+            [
                 "name" => "category",
                 "type" => "select",
                 "label" => "category",
                 "options" => ProductCategory::getAll(),
-                "selected" => $product ? $product->user_type_id : "",
+                "selected" => isset($this->category) ? $this->category : "",
             ],
             [
                 "name" => "image",
                 "type" => "image",
-                "label"=> "image"
+                "label" => "image"
             ],
         ];
-        return $fields;
     }
 
-
-    public static function getAll()
+    public static function getAll(): Builder|Collection
     {
         return self::join('product_category', 'product.category', '=', 'product_category.id')
             ->select('product_category.name as category_name', 'product.*');
     }
 
-
-    public function updateOrCreate($data)
+    public function getFieldsForFormattedList(): array
     {
-        try {
-            return (bool)self::query()->updateOrCreate(['id' => $data['id'] ?? null], $data);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return false;
-        }
+        return [
+            "tables" => [
+                'product' => [
+                    "image",
+                    "name",
+                    "price",
+                    "sku",
+                    "description",
+                ],
+                'product_category' => [
+                    "category_name",
+                ]
+            ],
+            "non-tables" => ['actions']
+        ];
     }
-
     public function product(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class);

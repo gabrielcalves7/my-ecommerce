@@ -24,7 +24,7 @@ class ProductFactory extends Factory
             'price' => $this->faker->randomFloat(2, 100, 1000),
             'category' => ProductCategory::query()->get('id')->random(),
             'description' => $this->faker->paragraph('1'),
-            'SKU' => $this->faker->randomNumber(6),
+            'sku' => $this->faker->randomNumber(6),
             'image' => $this->faker->imageUrl(640, 480, 'animals', true),
             'created_at' => now(),
             'updated_at' => now(),

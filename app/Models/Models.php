@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Helpers\Helper;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\HasApiTokens;
 
-class Models extends Authenticatable
+class Models extends Model
 {
 
     use HasFactory;
@@ -28,6 +30,11 @@ class Models extends Authenticatable
         return $this->fillable;
     }
 
+    public function unfilterableFields(): array
+    {
+        return ["image", "actions"];
+    }
+
     public function updateOrCreate($data)
     {
         try {
@@ -44,8 +51,7 @@ class Models extends Authenticatable
             $field = self::query()
                 ->where($field, $fieldValue)
                 ->where('deleted', '!=', true)
-                ->first()
-            ;
+                ->first();
             if ($field) {
                 $field->update(['deleted' => true]);
                 return [
@@ -74,5 +80,94 @@ class Models extends Authenticatable
                 ]
             ];
         }
+    }
+
+    public static function getAll(): Builder|Collection
+    {
+        return self::all();
+    }
+
+    public static function getAllOrderedBy(Builder|Collection $query, $orderBy, bool $orderAsc): Collection
+    {
+        return $query->orderBy($orderBy, $orderAsc ? 'asc' : 'desc');
+    }
+
+    public function searchModel(Builder|Collection $query, $field, $value): Builder|Collection
+    {
+        return $query->where($this->getTableAndFieldName($field), 'like', '%' . $value . '%');
+    }
+
+    public function orderModel($query, $orderBy, $orderAsc): Builder|Collection
+    {
+        return $query->orderBy($orderBy, $orderAsc ? 'asc' : 'desc');
+    }
+
+    public function handlePaginatedListsFilters($query, $queryParams)
+    {
+        $orderParams = self::removeOrderParamsFromQueryParams($queryParams);
+
+        $orderBy = $orderParams['order'];
+        $orderAsc = $orderParams['asc'];
+        if ($orderBy && $orderAsc) {
+            $query = $this->orderModel($query, $orderBy, $orderAsc);
+        }
+        if ($queryParams) {
+            foreach ($queryParams as $key => $value) {
+                $query = $this->searchModel($query, $key, $value);
+            }
+        }
+        return $query;
+    }
+
+    public static function getAllLike($field, $value)
+    {
+        return self::getAllOrderedBy();
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class);
+    }
+
+    public static function removeOrderParamsFromQueryParams(&$queryParams): array
+    {
+        $keysToDelete = ['order', 'asc'];
+
+        $storedValues = [];
+
+        foreach ($keysToDelete as $value) {
+            $storedValues[$value] = $queryParams[$value] ?? null;
+        }
+
+        unset($queryParams['order']);
+        unset($queryParams['asc']);
+
+        return $storedValues;
+    }
+
+    public function getFieldsForFormattedList(): array
+    {
+        return [
+
+        ];
+    }
+
+    public function getRelatedTableBasedOnField(string $field): string
+    {
+        return Helper::findKeyByValue($this->getFieldsForFormattedList(), $field);
+    }
+
+    public function getTableAndFieldName(string $field)
+    {
+        $table = $this->getRelatedTableBasedOnField($field);
+        return "$table." . $this->translateNames($field);
+    }
+
+    public function translateNames($name)
+    {
+        return match ($name) {
+            "category_name" => 'name',
+            default => $name,
+        };
     }
 }

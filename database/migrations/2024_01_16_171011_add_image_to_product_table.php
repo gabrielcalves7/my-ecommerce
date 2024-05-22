@@ -16,7 +16,7 @@ return new class extends Migration
             Schema::table('product', function (Blueprint $table) {
                 //
                 Schema::table('product', function (Blueprint $table) {
-                    $table->string('image')->after('category');
+                    $table->string('image')->nullable()->after('category');
                 });
             });
         }

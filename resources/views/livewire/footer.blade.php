@@ -17,3 +17,4 @@
 
     </div>
 </footer>
+<script src="{{ Vite::asset('resources/js/utils.js') }}"></script>
