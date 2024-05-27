@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Helpers\Helper;
 use App\Models\User as UserModel;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,14 +12,18 @@ class User extends Component
 
     use WithPagination;
 
+    private const VIEW_FOLDER = 'livewire.admin.users.';
     /**
      * @var
      */
+    private string $model;
+
     protected $user;
 
     public function __construct()
     {
-        $this->user = \App\Models\User::getAll();;
+        $this->model = 'user';
+        $this->user = new UserModel();
     }
 
     public function index()
@@ -29,38 +33,42 @@ class User extends Component
 
     public function view()
     {
-        $columns = [
-            "name",
-            "email",
-            "userType",
-            "phoneNumber",
-            "birthDate",
-            "document",
-            "actions",
-        ];
-        $a = $this->user->paginate(10);
+        $data = $this->user->getAll();
 
-        return view('livewire.admin.users.list', [
-            'data' => $a,
-            'langFile' => "users",
+        $fields = $this->user->getFieldsForFormattedList();
+
+        $searchParams = request()->get(ucfirst($this->model) . "Search");
+
+        if ($searchParams != []) {
+            $data = $this->product->handlePaginatedListsFilters($data, $searchParams);
+        }
+
+        $orderAsc = $searchParams['asc'] ?? 0;
+
+        return view(self::VIEW_FOLDER . 'list', [
+            'data' => $data->paginate(10),
+            'isOrderAsc' => $orderAsc,
+            'model' => $this->model,
             'title' => "Ver Produtos",
-            'infos' => $columns
+            'unfilterableFields' => $this->user->unfilterableFields(),
+            'infos' => Helper::flattenArray($fields),
         ]);
     }
 
+
     public function editUser($id)
     {
-        $user = \App\Models\User::findOrFail($id);
+        $user = $this->user->findOrFail($id);
 
         $fields = $user->createForm($user);
 
         return view(
-            'livewire.admin.users.edit',
+            self::VIEW_FOLDER . 'edit',
             [
                 'modelData' => $user,
                 'title' => "Editar Usuário",
                 'fields' => $fields,
-                'model' => "users"
+                'model' => $this->model,
             ]
         );
     }
@@ -70,6 +78,7 @@ class User extends Component
         $user = new UserModel();
 
         $data = request()->validate($user->getRules(request()->id));
+
         $update = $user->updateOrCreate($data);
 
         if ($update) {

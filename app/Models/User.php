@@ -24,7 +24,7 @@ class User extends Models implements Authenticatable
         'birthDate'
     ];
 
-    public function createForm(User $user = null): array
+    public function createForm(): array
     {
         $fields = [
             [
@@ -47,7 +47,12 @@ class User extends Models implements Authenticatable
                 "type" => "select",
                 "label" => "userType",
                 "options" => UserType::getAll(),
-                "selected" => $user ? $user->user_type_id : "",
+                "selected" => isset($this->user_type_id) ? $this->user_type_id : "",
+            ],
+            [
+                "name" => "mainPhone",
+                "type" => "tel",
+                "label" => "phoneNumber"
             ],
             [
                 "name" => "password",
@@ -94,6 +99,28 @@ class User extends Models implements Authenticatable
         return $this->hasOne(Phone::class)->where('main', '1')->select('number');
     }
 
+    public function AmazonS3Driver()
+    {
+        $a = $this->morphMany(
+            AmazonS3Driver::class,
+            'related',
+            'related_table',
+            'related_table_id'
+        );
+        return $a;
+    }
+
+    public function image()
+    {
+        $b = $this
+            ->AmazonS3Driver()
+            ->where('main', true)
+            ->where('deleted', false)
+            ->select('url')
+        ;
+        return $b;
+    }
+
     public function getRules($id = null): array
     {
         $v_CreateRules = [
@@ -102,7 +129,8 @@ class User extends Models implements Authenticatable
             'password' => 'required|min:6',
             'user_type_id' => 'required|numeric',
             'document' => 'required',
-            'birthDate' => 'required'
+            'birthDate' => 'required',
+            'image' => 'required|mimes:jpg,jpeg,png,bmp|max:20000'
         ];
 
         $v_EditRules = [
@@ -168,20 +196,20 @@ class User extends Models implements Authenticatable
      */
     public function getRememberToken()
     {
-        if (! empty($this->getRememberTokenName())) {
-            return (string) $this->{$this->getRememberTokenName()};
+        if (!empty($this->getRememberTokenName())) {
+            return (string)$this->{$this->getRememberTokenName()};
         }
     }
 
     /**
      * Set the token value for the "remember me" session.
      *
-     * @param  string  $value
+     * @param string $value
      * @return void
      */
     public function setRememberToken($value)
     {
-        if (! empty($this->getRememberTokenName())) {
+        if (!empty($this->getRememberTokenName())) {
             $this->{$this->getRememberTokenName()} = $value;
         }
     }
@@ -194,5 +222,36 @@ class User extends Models implements Authenticatable
     public function getRememberTokenName()
     {
         return $this->rememberTokenName;
+    }
+
+    public function getFieldsForFormattedList(): array
+    {
+        return [
+            "tables" => [
+                'user' => [
+                    "name",
+                    "email",
+                    "userType",
+                    "birthDate",
+                    "document",
+                ],
+                'phone' => [
+                    "phoneNumber"
+                ]
+            ],
+            parent::getFieldsForFormattedList()
+        ];
+    }
+
+    public function updateOrCreate($data)
+    {
+        try {
+            $update = parent::updateOrCreate($data);
+            $fileUpload = AmazonS3Driver::storeAndSaveFile($data, $update);
+            return $update && $fileUpload;
+        } catch (Exception $e) {
+            DB::rollBack();
+            return false;
+        }
     }
 }

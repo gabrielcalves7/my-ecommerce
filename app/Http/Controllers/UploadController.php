@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\AmazonS3Driver;
 use App\Models\Upload;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
 {
     private AmazonS3Driver $bucket;
+
     public function __construct()
     {
         $this->bucket = new AmazonS3Driver();
@@ -32,6 +34,17 @@ class UploadController extends Controller
         return response()->json([
             'success' => $this->bucket->deleteFile($fileUrl),
         ]);
+    }
+
+    public function get()
+    {
+        $string = "public/images/lPcvUiusEIPFO7rYVZ0gr8RxODgyLN7EGh8nlb1V.jpg";
+        if (Storage::disk('s3')->exists($string)) {
+            // ...
+            $b = Storage::url($string);
+            $c = Storage::download($string);
+            $a = 1;
+        }
     }
     //
 }

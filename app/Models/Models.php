@@ -38,7 +38,7 @@ class Models extends Model
     public function updateOrCreate($data)
     {
         try {
-            return (bool)self::query()->updateOrCreate(['id' => $data['id'] ?? null], $data);
+            return self::query()->updateOrCreate(['id' => $data['id'] ?? null], $data);
         } catch (Exception $e) {
             DB::rollBack();
             return false;
@@ -108,9 +108,11 @@ class Models extends Model
 
         $orderBy = $orderParams['order'];
         $orderAsc = $orderParams['asc'];
+
         if ($orderBy && $orderAsc) {
             $query = $this->orderModel($query, $orderBy, $orderAsc);
         }
+
         if ($queryParams) {
             foreach ($queryParams as $key => $value) {
                 $query = $this->searchModel($query, $key, $value);
@@ -148,7 +150,7 @@ class Models extends Model
     public function getFieldsForFormattedList(): array
     {
         return [
-
+            "non-tables" => ['actions']
         ];
     }
 

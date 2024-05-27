@@ -13,8 +13,14 @@ return new class extends Migration {
         Schema::create('upload', function (Blueprint $table) {
             $table->increments('id');
             $table->string('url')->default('wtf');
+            $table->string('related_table');
+            $table->integer('related_table_id');
             $table->boolean('deleted')->default(false);
+            $table->boolean('main')->default(true);
             $table->timestamps();
+
+            $table->index(['related_table', 'related_table_id']);
+
         });
     }
 
