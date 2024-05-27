@@ -39,7 +39,7 @@ class AmazonS3Driver extends Models
         $relatedTable = $model->getTable();
         try {
             $path = $file->store("public/images$folder");
-            (new AmazonS3Driver)->updateOrCreate([
+            (new AmazonS3Driver())->updateOrCreate([
                 'url'               => self::BUCKET_URL . $path,
                 'related_table_id'  => $relatedTableId,
                 'related_table'     => $relatedTable
