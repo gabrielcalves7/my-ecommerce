@@ -16,13 +16,13 @@
             <input type="file" onchange="previewImage(event)" name="image">
             <div>
                 <img id="imagePreview"
-                     src="{{($hasImage = isset($modelData->image) && count($modelData->image) > 0) ?
+                     src="{{($hasImage = (gettype($modelData->image) == 'Countable' || gettype($modelData->image) == 'object') && isset($modelData->image) && count($modelData->image) > 0) ?
                             \Illuminate\Support\Facades\Storage::disk('s3')
                                 ->temporaryUrl(
                                     $modelData?->image[0]?->url,
                                      now()->addHour()
                                 ) :
-                            null
+                            $hasImage = $modelData->image ?? null
                         }}" alt="Image Preview"
                      style="max-width: 300px; max-height: 300px;" {{!$hasImage ? 'class=hidden' : ''}}>
             </div>
