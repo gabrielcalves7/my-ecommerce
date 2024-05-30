@@ -12,20 +12,4 @@ class ProductCategory extends Components
         $this->model = new ProductCategoryModel();
         parent::__construct();
     }
-
-
-    public function createProductCategory()
-    {
-        return $this->create();
-    }
-
-    public function editProductCategory($id)
-    {
-        return $this->edit($id);
-    }
-
-    public function saveProductCategory()
-    {
-        return $this->save();
-    }
 }

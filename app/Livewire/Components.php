@@ -21,10 +21,6 @@ class Components extends Component
         $this->viewFolder = 'livewire.admin.' . $this->modelName . '.';
     }
 
-    public function index()
-    {
-    }
-
     public function view()
     {
         $data = $this->model->getAll();

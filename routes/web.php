@@ -42,21 +42,21 @@ Route::group(['middleware' => 'web'], function () {
         Route::controller(Admin::class)->group(function () {
             Route::controller(Product::class)->prefix('product')->group(function () {
                 Route::get('/', 'view')->name('product.view');
-                Route::get('/create', 'createProduct')->name('product.create');
-                Route::get('/product/{id}', 'editProduct')->name('single_product');
-                Route::post('/product/{id?}', 'saveProduct')->name('save_product');
+                Route::get('/create', 'create')->name('product.create');
+                Route::get('/product/{id}', 'edit')->name('single_product');
+                Route::post('/product/{id?}', 'save')->name('save_product');
             });
             Route::controller(User::class)->prefix('user')->group(function () {
                 Route::get('/', 'view')->name('user.view');
-                Route::get('/create', 'createUser')->name('user.create');
-                Route::get('/{id}', 'editUser')->name('single_user');
-                Route::post('/{id?}', 'saveUser')->name('save_user');
+                Route::get('/create', 'create')->name('user.create');
+                Route::get('/{id}', 'edit')->name('single_user');
+                Route::post('/{id?}', 'save')->name('save_user');
             });
             Route::controller(ProductCategory::class)->prefix('category')->group(function () {
                 Route::get('/', 'view')->name('category.view');
-                Route::get('/create/{id?}', 'createProductCategory')->name('category.create');
-                Route::get('/{id}', 'editProductCategory')->name('single_category');
-                Route::post('/{id?}', 'saveProductCategory')->name('save_category');
+                Route::get('/create/{id?}', 'create')->name('category.create');
+                Route::get('/{id}', 'edit')->name('single_category');
+                Route::post('/{id?}', 'save')->name('save_category');
             });
             Route::get('/', 'index')->name('admin');
         });
