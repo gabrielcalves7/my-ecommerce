@@ -35,7 +35,7 @@ class AmazonS3Driver extends Models
         return $this->deleteField('url', $url);
     }
 
-    public static function storeAndSaveFile($data, $model, $folder = ''): bool
+    public function storeAndSaveFile($data, $model, $folder = ''): bool
     {
         $file = $data['image'] ?? $data['file'];
         $relatedTableId = $model->id;
@@ -44,7 +44,7 @@ class AmazonS3Driver extends Models
             DB::beginTransaction();
             $path = $file->store("public/images$folder");
             self::setAllMainToFalse($relatedTableId, $relatedTable);
-            (new AmazonS3Driver())->updateOrCreate([
+            (new AmazonS3Driver())->updateOrCreate($this, [
                 'url' => self::BUCKET_URL . $path,
                 'related_table_id' => $relatedTableId,
                 'related_table' => $relatedTable

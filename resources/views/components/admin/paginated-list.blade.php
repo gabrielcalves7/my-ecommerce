@@ -44,7 +44,7 @@
                         @if($value2 != "actions")
                         <td style="width: calc(100%/{{count($infos)}})">
                             @if($value2 == 'image')
-                                <img src="{{count($value->$value2->toArray()) > 0 ?
+                                <img src="{{($value->$value2 != null && count($value->$value2->toArray()) > 0) ?
                                         \App\Models\AmazonS3Driver::renderImageFromBucket($value->$value2->toArray()[0]['url']) :
                                         Vite::asset('resources/images/noimage.png') }}" class="w-full">
                             @else

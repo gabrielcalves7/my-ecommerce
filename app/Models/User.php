@@ -2,20 +2,48 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\Authenticatable;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends UploadableModel implements Authenticatable
+class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens;
+    use Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    private UploadableModelServiceProvider $uploadableModel;
+
+    public function __construct()
+    {
+        $this->uploadableModel = new UploadableModelServiceProvider();
+    }
+
+    public function AmazonS3Driver()
+    {
+        return $this->morphMany(
+            AmazonS3Driver::class,
+            'related',
+            'related_table',
+            'related_table_id'
+        );
+    }
+
+    public function image()
+    {
+        $upload = $this->AmazonS3Driver()
+            ->where('main', true)
+            ->where('deleted', false)
+            ->select('url');
+        return $upload;
+    }
+
+    public function uploadableModel()
+    {
+        return $this->uploadableModel;
+    }
+
     protected $fillable = [
         'name',
         'email',
@@ -135,76 +163,6 @@ class User extends UploadableModel implements Authenticatable
             ->select('user_type.name as userType', 'user.*', 'phone.number as phoneNumber');
     }
 
-    public function getAuthIdentifierName()
-    {
-        return $this->getKeyName();
-    }
-
-    /**
-     * Get the unique identifier for the user.
-     *
-     * @return mixed
-     */
-    public function getAuthIdentifier()
-    {
-        return $this->{$this->getAuthIdentifierName()};
-    }
-
-    /**
-     * Get the unique broadcast identifier for the user.
-     *
-     * @return mixed
-     */
-    public function getAuthIdentifierForBroadcasting()
-    {
-        return $this->getAuthIdentifier();
-    }
-
-    /**
-     * Get the password for the user.
-     *
-     * @return string
-     */
-    public function getAuthPassword()
-    {
-        return $this->password;
-    }
-
-    /**
-     * Get the token value for the "remember me" session.
-     *
-     * @return string|null
-     */
-    public function getRememberToken()
-    {
-        if (!empty($this->getRememberTokenName())) {
-            return (string)$this->{$this->getRememberTokenName()};
-        }
-    }
-
-    /**
-     * Set the token value for the "remember me" session.
-     *
-     * @param string $value
-     * @return void
-     */
-    public function setRememberToken($value)
-    {
-        if (!empty($this->getRememberTokenName())) {
-            $this->{$this->getRememberTokenName()} = $value;
-        }
-    }
-
-    /**
-     * Get the column name for the "remember me" token.
-     *
-     * @return string
-     */
-    public function getRememberTokenName()
-    {
-        return $this->rememberTokenName;
-    }
-
     public function getFieldsForFormattedList(): array
     {
         return [
@@ -220,7 +178,6 @@ class User extends UploadableModel implements Authenticatable
                     "phoneNumber"
                 ]
             ],
-            parent::getFieldsForFormattedList()
         ];
     }
 }

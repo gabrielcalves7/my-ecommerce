@@ -11,8 +11,19 @@ class ProductCategory extends Models
     use HasFactory;
 
     protected $table = 'product_category';
+    private UploadableModelServiceProvider $uploadableModel;
 
     protected $fillable = ['name'];
+
+    public function __construct()
+    {
+        $this->uploadableModel = new UploadableModelServiceProvider();
+    }
+
+    public function uploadableModel()
+    {
+        return $this->uploadableModel;
+    }
 
     public function products()
     {
@@ -45,7 +56,7 @@ class ProductCategory extends Models
     {
         return [
             "tables" => [
-                'category' => [
+                'product_category' => [
                     "name",
                     "products_count",
                 ],

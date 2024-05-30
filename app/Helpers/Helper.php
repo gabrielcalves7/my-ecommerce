@@ -41,4 +41,11 @@ class Helper
         return $a;
 
     }
+
+    public static function camelToSnake($input) {
+        $output = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $input));
+
+        return $output;
+    }
+
 }

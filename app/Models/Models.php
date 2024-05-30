@@ -41,10 +41,10 @@ class Models extends Model
         return ["image", "actions"];
     }
 
-    public function updateOrCreate($data)
+    public function updateOrCreate($model, $data)
     {
         try {
-            return self::query()->updateOrCreate(['id' => $data['id'] ?? null], $data);
+            return $model->query()->updateOrCreate(['id' => $data['id'] ?? null], $data);
         } catch (Exception $e) {
             DB::rollBack();
             return false;
@@ -98,9 +98,9 @@ class Models extends Model
         return $query->orderBy($orderBy, $orderAsc ? 'asc' : 'desc');
     }
 
-    public function searchModel(Builder|Collection $query, $field, $value): Builder|Collection
+    public function searchModel(Builder|Collection $query, $field, $value, $model): Builder|Collection
     {
-        return $query->where($this->getTableAndFieldName($field), 'like', '%' . $value . '%');
+        return $query->where($this->getTableAndFieldName($field,$model), 'like', '%' . $value . '%');
     }
 
     public function orderModel($query, $orderBy, $orderAsc): Builder|Collection
@@ -108,7 +108,7 @@ class Models extends Model
         return $query->orderBy($orderBy, $orderAsc ? 'asc' : 'desc');
     }
 
-    public function handlePaginatedListsFilters($query, $queryParams)
+    public function handlePaginatedListsFilters($query, $queryParams, $model)
     {
         $orderParams = self::removeOrderParamsFromQueryParams($queryParams);
 
@@ -121,7 +121,7 @@ class Models extends Model
 
         if ($queryParams) {
             foreach ($queryParams as $key => $value) {
-                $query = $this->searchModel($query, $key, $value);
+                $query = $this->searchModel($query, $key, $value, $model);
             }
         }
         return $query;
@@ -155,14 +155,14 @@ class Models extends Model
         ];
     }
 
-    public function getRelatedTableBasedOnField(string $field): string
+    public function getRelatedTableBasedOnField(string $field, $model): string
     {
-        return Helper::findKeyByValue($this->getFieldsForFormattedList(), $field);
+        return Helper::findKeyByValue($model->getFieldsForFormattedList(), $field);
     }
 
-    public function getTableAndFieldName(string $field)
+    public function getTableAndFieldName(string $field, $model)
     {
-        $table = $this->getRelatedTableBasedOnField($field);
+        $table = $this->getRelatedTableBasedOnField($field, $model);
         return "$table." . $this->translateNames($field);
     }
 

@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
-class UploadableModel extends Models
+class UploadableModelServiceProvider extends Models
 {
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+    }
 
     public function AmazonS3Driver()
     {
@@ -24,12 +29,12 @@ class UploadableModel extends Models
         return $upload;
     }
 
-    public function updateOrCreate($data)
+    public function updateOrCreate($model,$data)
     {
         try {
-            $update = parent::updateOrCreate($data);
+            $update = parent::updateOrCreate($model,$data);
             if (isset($data['image']) || isset($data['file'])) {
-                $fileUpload = AmazonS3Driver::storeAndSaveFile($data, $update);
+                $fileUpload = (new AmazonS3Driver())->storeAndSaveFile($data, $update);
                 return $update && $fileUpload;
             }
             return $update;

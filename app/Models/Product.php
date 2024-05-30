@@ -5,14 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Product extends UploadableModel
+class Product extends Model
 {
     use HasFactory;
 
+    private UploadableModelServiceProvider $uploadableModel;
     protected $table = 'product';
-
     protected $fillable = [
         "name",
         "price",
@@ -20,6 +21,35 @@ class Product extends UploadableModel
         "description",
         "sku"
     ];
+
+    public function __construct()
+    {
+        $this->uploadableModel = new UploadableModelServiceProvider();
+    }
+
+    public function uploadableModel()
+    {
+        return $this->uploadableModel;
+    }
+
+    public function AmazonS3Driver()
+    {
+        return $this->morphMany(
+            AmazonS3Driver::class,
+            'related',
+            'related_table',
+            'related_table_id'
+        );
+    }
+
+    public function image()
+    {
+        $upload = $this->AmazonS3Driver()
+            ->where('main', true)
+            ->where('deleted', false)
+            ->select('url');
+        return $upload;
+    }
 
     public function getRules($id = null): array
     {
