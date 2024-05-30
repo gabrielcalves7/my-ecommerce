@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Doctrine\Inflector\InflectorFactory;
+
 class Helper
 {
     public static function flattenArray($array) {
@@ -32,5 +34,11 @@ class Helper
         }
         return null; // Return null if the value is not found
     }
+    public static function singularize($word)
+    {
+        $inflector = InflectorFactory::create()->build();
+        $a = $inflector->singularize($word);
+        return $a;
 
+    }
 }

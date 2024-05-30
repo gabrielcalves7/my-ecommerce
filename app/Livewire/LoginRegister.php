@@ -83,7 +83,8 @@ class LoginRegister extends Component
         $this->resetInputFields();
     }
 
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
     }
 

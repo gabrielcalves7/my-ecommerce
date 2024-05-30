@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
+
 class AmazonS3Driver extends Models
 {
     private const BUCKET_URL = "";
@@ -18,6 +20,7 @@ class AmazonS3Driver extends Models
     {
         return $this->morphTo();
     }
+
     public function saveFile($file, $folder = ''): string
     {
         try {
@@ -38,15 +41,35 @@ class AmazonS3Driver extends Models
         $relatedTableId = $model->id;
         $relatedTable = $model->getTable();
         try {
+            DB::beginTransaction();
             $path = $file->store("public/images$folder");
+            self::setAllMainToFalse($relatedTableId, $relatedTable);
             (new AmazonS3Driver())->updateOrCreate([
-                'url'               => self::BUCKET_URL . $path,
-                'related_table_id'  => $relatedTableId,
-                'related_table'     => $relatedTable
+                'url' => self::BUCKET_URL . $path,
+                'related_table_id' => $relatedTableId,
+                'related_table' => $relatedTable
             ]);
+            DB::commit();
             return true;
         } catch (\Exception $e) {
+            DB::rollBack();
             return false;
         }
+    }
+
+    public static function setAllMainToFalse($relatedTableId, $relatedTable)
+    {
+        AmazonS3Driver::where('related_table_id', $relatedTableId)
+            ->where('related_table', $relatedTable)
+            ->update(['main' => 0]);
+    }
+
+    public static function renderImageFromBucket($url)
+    {
+        return \Illuminate\Support\Facades\Storage::disk('s3')
+            ->temporaryUrl(
+                $url,
+                now()->addHour()
+            );
     }
 }

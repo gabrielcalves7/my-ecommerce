@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Helpers\Helper;
 use Livewire\Component;
 
 class AdminHeader extends Component
@@ -12,8 +13,8 @@ class AdminHeader extends Component
             $actions = [];
 
             foreach ($value['actions'] as $key => &$action) {
-                $url = strtolower($value['name'] . '.' . $action);
-                $url = $this->routeExists($url);
+                $url = strtolower(Helper::singularize($value['name']) . '.' . $action);
+                $url = $this->routeExists(Helper::singularize($url));
                 $actions[] = ["name" => $action, "url" => $url];
             }
             $value['actions'] = $actions;
@@ -35,7 +36,7 @@ class AdminHeader extends Component
                     "view",
                     "create"
                 ],
-                "url" => route("users.view")
+                "url" => route("user.view")
             ],
             [
                 "name" => "Products",
@@ -43,7 +44,15 @@ class AdminHeader extends Component
                     "view",
                     "create"
                 ],
-                "url" => route("products.view")
+                "url" => route("product.view")
+            ],
+            [
+                "name" => "Categories",
+                "actions" => [
+                    "view",
+                    "create"
+                ],
+                "url" => route("category.view")
             ]
         ];
         return $this->setActionsURL($options);

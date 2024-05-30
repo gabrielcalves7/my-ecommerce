@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Models implements Authenticatable
+class User extends UploadableModel implements Authenticatable
 {
     use HasApiTokens, Notifiable;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -99,27 +100,7 @@ class User extends Models implements Authenticatable
         return $this->hasOne(Phone::class)->where('main', '1')->select('number');
     }
 
-    public function AmazonS3Driver()
-    {
-        $a = $this->morphMany(
-            AmazonS3Driver::class,
-            'related',
-            'related_table',
-            'related_table_id'
-        );
-        return $a;
-    }
 
-    public function image()
-    {
-        $b = $this
-            ->AmazonS3Driver()
-            ->where('main', true)
-            ->where('deleted', false)
-            ->select('url')
-        ;
-        return $b;
-    }
 
     public function getRules($id = null): array
     {
@@ -130,7 +111,7 @@ class User extends Models implements Authenticatable
             'user_type_id' => 'required|numeric',
             'document' => 'required',
             'birthDate' => 'required',
-            'image' => 'required|mimes:jpg,jpeg,png,bmp|max:20000'
+            'image' => 'mimes:jpg,jpeg,png,bmp|max:20000'
         ];
 
         $v_EditRules = [
@@ -241,17 +222,5 @@ class User extends Models implements Authenticatable
             ],
             parent::getFieldsForFormattedList()
         ];
-    }
-
-    public function updateOrCreate($data)
-    {
-        try {
-            $update = parent::updateOrCreate($data);
-            $fileUpload = AmazonS3Driver::storeAndSaveFile($data, $update);
-            return $update && $fileUpload;
-        } catch (Exception $e) {
-            DB::rollBack();
-            return false;
-        }
     }
 }

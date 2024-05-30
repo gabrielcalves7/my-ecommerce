@@ -7,90 +7,42 @@ use App\Models\User as UserModel;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class User extends Component
+class User extends Components
 {
 
     use WithPagination;
 
-    private const VIEW_FOLDER = 'livewire.admin.users.';
+    protected string $viewFolder;
+
     /**
      * @var
      */
-    private string $model;
-
-    protected $user;
 
     public function __construct()
     {
-        $this->model = 'user';
-        $this->user = new UserModel();
+        $this->modelName = 'user';
+        $this->model = new UserModel();
+        parent::__construct();
     }
 
     public function index()
     {
-        return view('livewire.user', ['products' => $this->user->paginate(10)]);
+        return view('livewire.user', ['products' => $this->model->paginate(10)]);
     }
 
-    public function view()
+    public function createUser()
     {
-        $data = $this->user->getAll();
-
-        $fields = $this->user->getFieldsForFormattedList();
-
-        $searchParams = request()->get(ucfirst($this->model) . "Search");
-
-        if ($searchParams != []) {
-            $data = $this->product->handlePaginatedListsFilters($data, $searchParams);
-        }
-
-        $orderAsc = $searchParams['asc'] ?? 0;
-
-        return view(self::VIEW_FOLDER . 'list', [
-            'data' => $data->paginate(10),
-            'isOrderAsc' => $orderAsc,
-            'model' => $this->model,
-            'title' => "Ver Produtos",
-            'unfilterableFields' => $this->user->unfilterableFields(),
-            'infos' => Helper::flattenArray($fields),
-        ]);
-    }
-
-
-    public function editUser($id)
-    {
-        $user = $this->user->findOrFail($id);
-
-        $fields = $user->createForm($user);
-
-        return view(
-            self::VIEW_FOLDER . 'edit',
-            [
-                'modelData' => $user,
-                'title' => "Editar Usuário",
-                'fields' => $fields,
-                'model' => $this->model,
-            ]
-        );
+        return $this->create();
     }
 
     public function saveUser()
     {
-        $user = new UserModel();
-
-        $data = request()->validate($user->getRules(request()->id));
-
-        $update = $user->updateOrCreate($data);
-
-        if ($update) {
-            return redirect()->route('users.view')->with([
-                'message' => "Operação realizada com sucesso",
-                'type' => "success"
-            ]);
-        }
-        return redirect()->back()->with([
-            'message',
-            "Operação não realizada",
-            'type' => 'warning'
-        ]);
+        return $this->save();
     }
+
+    public function editUser($id)
+    {
+        return $this->edit($id);
+    }
+
 }

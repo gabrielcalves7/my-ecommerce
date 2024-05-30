@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Product extends Models
+class Product extends UploadableModel
 {
     use HasFactory;
 
@@ -18,7 +18,6 @@ class Product extends Models
         "price",
         "category",
         "description",
-        "image",
         "sku"
     ];
 
@@ -30,7 +29,7 @@ class Product extends Models
             'category' => 'required',
             'description' => 'required',
             'sku' => 'required',
-            'image'
+            'image' => 'mimes:jpg,jpeg,png,bmp|max:20000'
         ];
 
         $v_EditRules = [
@@ -71,7 +70,7 @@ class Product extends Models
                 "name" => "category",
                 "type" => "select",
                 "label" => "category",
-                "options" => ProductCategory::getAll(),
+                "options" => ProductCategory::getAll()->pluck('name', 'id'),
                 "selected" => isset($this->category) ? $this->category : "",
             ],
             [
@@ -106,10 +105,10 @@ class Product extends Models
             "non-tables" => ['actions']
         ];
     }
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class);
     }
-
 
 }

@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Auth;
 class UserType extends Model
 {
     use HasFactory;
+
     protected $table = "user_type";
+
     public static function isAdmin(): bool
     {
         return Auth::check() && Auth::user()->user_type_id == 1;
@@ -17,6 +19,6 @@ class UserType extends Model
 
     public static function getAll()
     {
-        return self::all()->pluck('name','id');
+        return self::all()->pluck('name', 'id');
     }
 }

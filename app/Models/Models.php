@@ -22,7 +22,13 @@ class Models extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+
     ];
+
+    public function getRules($id = null): array
+    {
+        return [];
+    }
 
 
     public function getFillable()
@@ -84,7 +90,7 @@ class Models extends Model
 
     public static function getAll(): Builder|Collection
     {
-        return self::all();
+        return self::query();
     }
 
     public static function getAllOrderedBy(Builder|Collection $query, $orderBy, bool $orderAsc): Collection
@@ -119,11 +125,6 @@ class Models extends Model
             }
         }
         return $query;
-    }
-
-    public static function getAllLike($field, $value)
-    {
-        return self::getAllOrderedBy();
     }
 
     public function product(): BelongsTo
